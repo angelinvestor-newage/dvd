@@ -26,7 +26,7 @@
     }
     .dvd-logo {
       position: absolute;
-      width: 750px; /* 5x original 150px */
+      width: 500px; /* 1/4th of previous giant size (2000px) */
       height: auto;
     }
     svg {
@@ -36,12 +36,12 @@
   </style>
 </head>
 <body>
-  <div id="cornerCounter">Corner Hits: 0</div>
+  <div id="cornerCounter">Four Corner Hits: 0</div>
   <div id="logo" class="dvd-logo">
     <!-- Inline SVG for dynamic styling -->
     <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
       <text id="dvdText" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-            font-size="120" font-family="Arial Black" fill="#ffffff">DVD</text>
+            font-size="120" font-family="Arial Black" fill="white">DVD</text>
     </svg>
   </div>
 
@@ -52,10 +52,13 @@
 
     let posX = 100, posY = 100;
     let velX = 3, velY = 3;
-    let cornerHits = 0;
+    let fourCornerHits = 0;
+    const cornersHit = { tl: false, tr: false, br: false, bl: false };
+    const tolerance = 10;
 
     function getRandomColor() {
-      return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+      const colors = ['cyan', 'magenta', 'yellow', 'lime', 'white', 'orange', 'red', 'blue', 'hotpink'];
+      return colors[Math.floor(Math.random() * colors.length)];
     }
 
     function update() {
@@ -77,15 +80,31 @@
         hitY = true;
       }
 
-      // Change color on any wall hit
-      if (hitX || hitY) {
-        svgText.setAttribute('fill', getRandomColor());
-      }
-
-      // Count only corner hits
       if (hitX && hitY) {
-        cornerHits++;
-        counterDisplay.innerText = `Corner Hits: ${cornerHits}`;
+        // Determine which corner was hit
+        const atLeft = posX <= tolerance;
+        const atRight = posX + lw >= w - tolerance;
+        const atTop = posY <= tolerance;
+        const atBottom = posY + lh >= h - tolerance;
+        let corner = null;
+        if (atLeft && atTop) corner = 'tl';
+        else if (atRight && atTop) corner = 'tr';
+        else if (atRight && atBottom) corner = 'br';
+        else if (atLeft && atBottom) corner = 'bl';
+
+        // Mark corner
+        if (corner && !cornersHit[corner]) {
+          cornersHit[corner] = true;
+        }
+
+        // If all four corners have been hit, increment counter and reset
+        if (cornersHit.tl && cornersHit.tr && cornersHit.br && cornersHit.bl) {
+          fourCornerHits++;
+          counterDisplay.innerText = `Four Corner Hits: ${fourCornerHits}`;
+          svgText.setAttribute('fill', getRandomColor());
+          // Reset for next cycle
+          cornersHit.tl = cornersHit.tr = cornersHit.br = cornersHit.bl = false;
+        }
       }
 
       logo.style.left = posX + 'px';
