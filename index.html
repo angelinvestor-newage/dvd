@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DVD Bouncer Color Giant</title>
+  <title>DVD Bouncer Color</title>
   <style>
     html, body {
       margin: 0;
@@ -26,7 +26,7 @@
     }
     .dvd-logo {
       position: absolute;
-      width: 2000px; /* 5x bigger than 400px */
+      width: 750px; /* 5x original 150px */
       height: auto;
     }
     svg {
@@ -41,7 +41,7 @@
     <!-- Inline SVG for dynamic styling -->
     <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
       <text id="dvdText" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-            font-size="120" font-family="Arial Black" fill="white">DVD</text>
+            font-size="120" font-family="Arial Black" fill="#ffffff">DVD</text>
     </svg>
   </div>
 
@@ -55,8 +55,7 @@
     let cornerHits = 0;
 
     function getRandomColor() {
-      const colors = ['cyan', 'magenta', 'yellow', 'lime', 'white', 'orange', 'red', 'blue', 'hotpink'];
-      return colors[Math.floor(Math.random() * colors.length)];
+      return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
     }
 
     function update() {
@@ -78,10 +77,15 @@
         hitY = true;
       }
 
+      // Change color on any wall hit
+      if (hitX || hitY) {
+        svgText.setAttribute('fill', getRandomColor());
+      }
+
+      // Count only corner hits
       if (hitX && hitY) {
         cornerHits++;
-        counterDisplay.innerText = `4 Corner Hits: ${cornerHits}`;
-        svgText.setAttribute('fill', getRandomColor());
+        counterDisplay.innerText = `Corner Hits: ${cornerHits}`;
       }
 
       logo.style.left = posX + 'px';
