@@ -71,25 +71,26 @@
 
       let hitX = false;
       let hitY = false;
-      let hitAny = false;
 
-      if (posX < 0) {
-        posX = 0; velX = -velX; hitX = hitAny = true;
-      } else if (posX + lw > w) {
-        posX = w - lw; velX = -velX; hitX = hitAny = true;
+      // Horizontal bounce
+      if (posX <= 0) {
+        posX = 0; velX = -velX; hitX = true;
+      } else if (posX + lw >= w) {
+        posX = w - lw; velX = -velX; hitX = true;
       }
-      if (posY < 0) {
-        posY = 0; velY = -velY; hitY = hitAny = true;
-      } else if (posY + lh > h) {
-        posY = h - lh; velY = -velY; hitY = hitAny = true;
-      }
-
-      // Change color on any wall hit
-      if (hitAny) {
-        svgText.setAttribute('fill', getRandomColor());
+      // Vertical bounce
+      if (posY <= 0) {
+        posY = 0; velY = -velY; hitY = true;
+      } else if (posY + lh >= h) {
+        posY = h - lh; velY = -velY; hitY = true;
       }
 
-      // Corner detection and cycle counting
+      // Change color on any bounce
+      if (hitX || hitY) {
+        svgText.style.fill = getRandomColor();
+      }
+
+      // Corner detection
       if (hitX && hitY) {
         const atLeft = posX === 0;
         const atRight = posX + lw === w;
@@ -104,7 +105,6 @@
         if (cornersHit.tl && cornersHit.tr && cornersHit.br && cornersHit.bl) {
           fourCornerHits++;
           counterDisplay.innerText = `Four Corner Hits: ${fourCornerHits}`;
-          // reset corners
           Object.keys(cornersHit).forEach(k => cornersHit[k] = false);
         }
       }
