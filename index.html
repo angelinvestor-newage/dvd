@@ -26,7 +26,7 @@
     }
     .dvd-logo {
       position: absolute;
-      width: 500px; /* 1/4th of previous giant size (2000px) */
+      width: 500px; /* quarter size */
       height: auto;
     }
     svg {
@@ -50,11 +50,11 @@
     const svgText = document.getElementById('dvdText');
     const counterDisplay = document.getElementById('cornerCounter');
 
+    // Initial position and velocity
     let posX = 100, posY = 100;
     let velX = 3, velY = 3;
     let fourCornerHits = 0;
     const cornersHit = { tl: false, tr: false, br: false, bl: false };
-    const tolerance = 10;
 
     function getRandomColor() {
       const colors = ['cyan', 'magenta', 'yellow', 'lime', 'white', 'orange', 'red', 'blue', 'hotpink'];
@@ -67,46 +67,61 @@
       const lw = logo.offsetWidth;
       const lh = logo.offsetHeight;
 
+      // Move
       posX += velX;
       posY += velY;
 
       let hitX = false, hitY = false;
-      if (posX <= 0 || posX + lw >= w) {
-        velX *= -1;
+
+      // Horizontal bounce with clamping
+      if (posX < 0) {
+        posX = 0;
+        velX = -velX;
+        hitX = true;
+      } else if (posX + lw > w) {
+        posX = w - lw;
+        velX = -velX;
         hitX = true;
       }
-      if (posY <= 0 || posY + lh >= h) {
-        velY *= -1;
+
+      // Vertical bounce with clamping
+      if (posY < 0) {
+        posY = 0;
+        velY = -velY;
+        hitY = true;
+      } else if (posY + lh > h) {
+        posY = h - lh;
+        velY = -velY;
         hitY = true;
       }
 
+      // If bouncing on both axes, it's a corner bounce
       if (hitX && hitY) {
-        // Determine which corner was hit
-        const atLeft = posX <= tolerance;
-        const atRight = posX + lw >= w - tolerance;
-        const atTop = posY <= tolerance;
-        const atBottom = posY + lh >= h - tolerance;
+        // Identify which corner
+        const atLeft = posX === 0;
+        const atRight = posX + lw === w;
+        const atTop = posY === 0;
+        const atBottom = posY + lh === h;
         let corner = null;
         if (atLeft && atTop) corner = 'tl';
         else if (atRight && atTop) corner = 'tr';
         else if (atRight && atBottom) corner = 'br';
         else if (atLeft && atBottom) corner = 'bl';
 
-        // Mark corner
-        if (corner && !cornersHit[corner]) {
-          cornersHit[corner] = true;
-        }
+        // Mark corner if valid
+        if (corner) cornersHit[corner] = true;
 
-        // If all four corners have been hit, increment counter and reset
+        // When all four corners visited, increment and reset
         if (cornersHit.tl && cornersHit.tr && cornersHit.br && cornersHit.bl) {
           fourCornerHits++;
           counterDisplay.innerText = `Four Corner Hits: ${fourCornerHits}`;
           svgText.setAttribute('fill', getRandomColor());
-          // Reset for next cycle
-          cornersHit.tl = cornersHit.tr = cornersHit.br = cornersHit.bl = false;
+          // Reset corners
+          Object.keys(cornersHit).forEach(k => cornersHit[k] = false);
         }
       }
 
+      // Apply position
       logo.style.left = posX + 'px';
       logo.style.top = posY + 'px';
 
