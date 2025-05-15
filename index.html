@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DVD Bouncer</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      font-family: monospace;
+      color: lime;
+    }
+    #cornerCounter {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 0.5em 1em;
+      border: 2px solid lime;
+    }
+    #logo {
+      position: absolute;
+      width: 100px;
+      height: 60px;
+      background: url('dvd-logo.png') no-repeat center center;
+      background-size: contain;
+    }
+  </style>
+</head>
+<body>
+  <div id="logo"></div>
+  <div id="cornerCounter">Corner Hits: 0</div>
+
+  <script>
+    const logo = document.getElementById('logo');
+    const counterDisplay = document.getElementById('cornerCounter');
+
+    let posX = 100, posY = 100;
+    let velX = 2, velY = 2;
+    let cornerHits = 0;
+
+    function update() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const lw = logo.offsetWidth;
+      const lh = logo.offsetHeight;
+
+      posX += velX;
+      posY += velY;
+
+      if (posX <= 0 || posX + lw >= w) velX *= -1;
+      if (posY <= 0 || posY + lh >= h) velY *= -1;
+
+      const tolerance = 10;
+      const atLeft = posX <= tolerance;
+      const atRight = posX + lw >= w - tolerance;
+      const atTop = posY <= tolerance;
+      const atBottom = posY + lh >= h - tolerance;
+
+      if ((atLeft || atRight) && (atTop || atBottom)) {
+        cornerHits++;
+        counterDisplay.innerText = `Corner Hits: ${cornerHits}`;
+      }
+
+      logo.style.left = posX + 'px';
+      logo.style.top = posY + 'px';
+
+      requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  </script>
+</body>
+</html>
