@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DVD Bouncer Color</title>
+  <title>DVD Bouncer with Believe Ad</title>
   <style>
     html, body {
       margin: 0;
@@ -15,8 +15,7 @@
     }
     #cornerCounter {
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       font-size: 2em;
       background: rgba(0, 0, 0, 0.7);
@@ -26,19 +25,44 @@
     }
     .dvd-logo {
       position: absolute;
-      width: 500px; /* quarter size */
+      width: 500px;
       height: auto;
     }
-    svg {
-      width: 100%;
-      height: 100%;
+    /* Believe ad container */
+    #believeAd {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      text-align: center;
+      z-index: 20;
     }
+    #believeAd img {
+      width: 100px;
+      height: auto;
+      display: block;
+      margin-bottom: 5px;
+      border: 2px solid lime;
+    }
+    #believeAd a {
+      color: #0ff;
+      text-decoration: none;
+      font-size: 1em;
+      display: block;
+    }
+    svg { width: 100%; height: 100%; }
   </style>
 </head>
 <body>
+  <!-- Believe ad in top-right -->
+  <div id="believeAd">
+    <a href="https://believe.app/coin/CKWSQRywJ2yieAMXfgoEc9FCWAnn7oAJyo1fenpBRzam" target="_blank">
+      <img src="believe.jpg" alt="Believe Coin">
+      <span>Click here to buy</span>
+    </a>
+  </div>
+
   <div id="cornerCounter">Four Corner Hits: 0</div>
   <div id="logo" class="dvd-logo">
-    <!-- Inline SVG for dynamic styling -->
     <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
       <text id="dvdText" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
             font-size="120" font-family="Arial Black" fill="white">DVD</text>
@@ -49,48 +73,28 @@
     const logo = document.getElementById('logo');
     const svgText = document.getElementById('dvdText');
     const counterDisplay = document.getElementById('cornerCounter');
-
-    let posX = 100, posY = 100;
-    let velX = 3, velY = 3;
+    let posX = 100, posY = 100, velX = 3, velY = 3;
     let fourCornerHits = 0;
     const cornersHit = { tl: false, tr: false, br: false, bl: false };
 
     function getRandomColor() {
-      const colors = ['#00FFFF', '#FF00FF', '#FFFF00', '#00FF00', '#FFFFFF', '#FFA500', '#FF0000', '#0000FF', '#FF69B4'];
+      const colors = ['#00FFFF','#FF00FF','#FFFF00','#00FF00','#FFFFFF','#FFA500','#FF0000','#0000FF','#FF69B4'];
       return colors[Math.floor(Math.random() * colors.length)];
     }
 
     function update() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const lw = logo.offsetWidth;
-      const lh = logo.offsetHeight;
+      const w = window.innerWidth, h = window.innerHeight;
+      const lw = logo.offsetWidth, lh = logo.offsetHeight;
+      posX += velX; posY += velY;
+      let hitX = false, hitY = false;
+      if (posX <= 0) { posX = 0; velX = -velX; hitX = true; }
+      else if (posX + lw >= w) { posX = w - lw; velX = -velX; hitX = true; }
+      if (posY <= 0) { posY = 0; velY = -velY; hitY = true; }
+      else if (posY + lh >= h) { posY = h - lh; velY = -velY; hitY = true; }
 
-      posX += velX;
-      posY += velY;
-
-      let hitX = false;
-      let hitY = false;
-
-      // Horizontal bounce
-      if (posX <= 0) {
-        posX = 0; velX = -velX; hitX = true;
-      } else if (posX + lw >= w) {
-        posX = w - lw; velX = -velX; hitX = true;
-      }
-      // Vertical bounce
-      if (posY <= 0) {
-        posY = 0; velY = -velY; hitY = true;
-      } else if (posY + lh >= h) {
-        posY = h - lh; velY = -velY; hitY = true;
-      }
-
-      // Change color on any bounce
       if (hitX || hitY) {
-        svgText.style.fill = getRandomColor();
+        svgText.setAttribute('fill', getRandomColor());
       }
-
-      // Corner detection
       if (hitX && hitY) {
         const atLeft = posX === 0;
         const atRight = posX + lw === w;
@@ -113,7 +117,6 @@
       logo.style.top = posY + 'px';
       requestAnimationFrame(update);
     }
-
     requestAnimationFrame(update);
   </script>
 </body>
